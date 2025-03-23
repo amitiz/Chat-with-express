@@ -33,9 +33,17 @@ const createBotResponse = async (incomingMessageDiv) => {
     const messageElement = incomingMessageDiv.querySelector(".message-text");
 
     try {
-        const response = await fetch("http://localhost:5001/chat", {
+        // Use localhost:5001 when running locally with live-server (127.0.0.1:5500)
+        const baseURL = window.location.hostname === '127.0.0.1' 
+            ? 'http://localhost:5001'
+            : 'https://chat-with-express-peach.vercel.app';
+            
+        const response = await fetch(`${baseURL}/chat`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({ message: userData.message, file: userData.file.data ? userData.file: null }),
         })
 
@@ -47,59 +55,11 @@ const createBotResponse = async (incomingMessageDiv) => {
     } catch (error) {
         messageElement.innerText = error.message; 
         messageElement.style.color = "#ff0000";
-
     } finally {
         userData.file = {};
         incomingMessageDiv.classList.remove("thinking");
         chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth"});
-
-
     }
-
-
-
-    // chatHistory.push({
-    //     role: "user",
-    //     parts: [{ text: userData.message}, ...(userData.file.data ? [{ inline_data: userData.file }]: [])],
-    // });
-
-    // const requestOptions = {
-    //     method: "POST", 
-    //     headers: { "Content-type": "application/json" },
-    //     body: JSON.stringify({
-    //         contents: chatHistory,
-    //     })
-    // }
-
-    // //create an api request
-    // try {
-    //     const response = await fetch (API_URL, requestOptions); 
-    //     const data = await response.json();
-    //     if(!response.ok) throw new Error(data.error.message);
-    //    // console.log("data", data);
-       
-    
-    //     const apiResponseText = data.candidates[0].content.parts[0].text;
-    //     messageElement.innerText = apiResponseText;
-    
-    //     //add bot response to chat history 
-    //     chatHistory.push({
-    //         role: "model",
-    //         parts: [ { text: apiResponseText }],
-    //     })
-    // } catch (error) {
-    //     console.log("Error",error);; 
-    //     messageElement.innerText = error.message; 
-    //     messageElement.style.color = "#ff0000";
-
-    // } finally {
-    //     //resest user's file data, remove thinking indicator and scroll chat to bottom 
-    //     userData.file = {};
-    //     incomingMessageDiv.classList.remove("thinking");
-    //     chatBody.scrollTo({ top: chatBody.scrollHeight, behavior: "smooth"});
-    // }
-   
-
 }
 
 

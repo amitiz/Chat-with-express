@@ -33,10 +33,10 @@ const createBotResponse = async (incomingMessageDiv) => {
     const messageElement = incomingMessageDiv.querySelector(".message-text");
 
     try {
-        // Use localhost:5001 when running locally with live-server (127.0.0.1:5500)
+        // Use localhost:5002 when running locally with live-server (127.0.0.1:5500)
         const baseURL = window.location.hostname === '127.0.0.1' 
-            ? 'http://localhost:5001'
-            : 'https://chat-with-express-peach.vercel.app';
+            ? 'http://localhost:5002'
+            : 'chat-with-express-nine.vercel.app';
             
         const response = await fetch(`${baseURL}/chat`, {
             method: "POST",

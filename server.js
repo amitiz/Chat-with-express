@@ -1,27 +1,50 @@
-require('dotenv').config();
-const express = require('express')
-const cors = require("cors");
+import express from 'express';
+import cors from 'cors';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const axios = require("axios");
+dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 5002;
 
-const app = express()
-const PORT = process.env.PORT || 5001;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-//add middleware 
-app.use(cors());
+// More permissive CORS configuration
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', true);
+    
+    // Handle OPTIONS method
+    if (req.method === 'OPTIONS') {
+        return res.status(200).json({
+            body: "OK"
+        });
+    }
+    
+    next();
+});
+
 app.use(express.json());
-const api_key = process.env.API_KEY;
-console.log(api_key);
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${api_key}`;
-console.log(url);
-//return;
 
+// Serve static files
+app.use(express.static(path.join(__dirname)));
+
+// Serve index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 app.post("/chat", async (req, res) => {
-    console.log("Here");
     try {
-        const { message, file} = req.body;
+        const { message, file } = req.body;
+        const api_key = process.env.API_KEY;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${api_key}`;
 
         const chatHistory = [
             {
@@ -43,8 +66,6 @@ app.post("/chat", async (req, res) => {
             error: error.response ? error.response.data: error.message || "Internal Server Error"
         });
     }
-
-
 });
 
 //start the server 
